@@ -1,19 +1,21 @@
 package deck
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 )
 
 //Card is the definition of a playing card
 type Card struct {
-	suit  string
-	value string
+	Suit  string
+	Value string
 }
 
 //Deck contains a slice of cards
 type Deck struct {
 	Cards []Card
+	Empty bool
 }
 
 func (d *Deck) createSuite(suit string) {
@@ -41,14 +43,29 @@ func (d *Deck) BuildDeck() {
 	d.createSuite("Clubs")
 	d.createSuite("Hearts")
 	d.createSuite("Diamonds")
+	d.Empty = false
 }
 
 //Deal removes n cards from the top of the deck and returns the cards in a slice
 func (d *Deck) Deal(n int) []Card {
 	var hand []Card
+	cardsLeft := len(d.Cards)
+	if n > cardsLeft {
+		fmt.Printf("Dealing last %v cards from deck\n", cardsLeft)
+
+		for i := 0; i < cardsLeft; i++ {
+			hand = append(hand, d.Cards[0])
+			d.Cards = append(d.Cards[:0], d.Cards[1:]...)
+		}
+		d.Empty = true
+		return hand
+	}
 	for i := 0; i < n; i++ {
 		hand = append(hand, d.Cards[0])
 		d.Cards = append(d.Cards[:0], d.Cards[1:]...)
+	}
+	if len(d.Cards) <= 0 {
+		d.Empty = true
 	}
 	return hand
 }
